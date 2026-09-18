@@ -13,14 +13,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install validation dependencies
-        run: python -m pip install -q requests pypdf cryptography beautifulsoup4
-      - name: Retrieve and validate public sources
-        run: python crc50/deep_retrieval.py
+      - name: Install browser and PDF validation
+        run: |
+          python -m pip install -q requests pypdf cryptography beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+      - name: Retrieve public files using standard browser
+        run: python crc50/browser_public.py
       - name: Upload encrypted retrieval result
         uses: actions/upload-artifact@v4
         with:
-          name: CRC50-deep-encrypted
+          name: CRC50-browser-encrypted
           path: deep_artifact/
           retention-days: 1
           if-no-files-found: error
