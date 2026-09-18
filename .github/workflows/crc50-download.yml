@@ -8,19 +8,19 @@ permissions:
 jobs:
   download:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install PDF validation and artifact encryption dependencies
+      - name: Install validation and encryption dependencies
         run: python -m pip install --disable-pip-version-check requests pypdf cryptography
-      - name: Retrieve public originals and verify identity
-        run: python -u crc50/download.py
+      - name: Retrieve targeted originals and preserve source versions
+        run: python -u crc50/supplement.py
       - name: Upload encrypted temporary bundle
         uses: actions/upload-artifact@v4
         with:
-          name: CRC50-encrypted-originals
+          name: CRC50-encrypted-supplement
           path: encrypted_artifact/
           retention-days: 1
           if-no-files-found: error
