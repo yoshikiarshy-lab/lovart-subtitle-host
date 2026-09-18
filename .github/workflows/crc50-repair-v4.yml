@@ -1,0 +1,26 @@
+name: CRC50 source diagnosis and repair
+on:
+  push:
+    branches: ['temp/crc50-download-20260918']
+    paths: ['.github/workflows/crc50-repair-v4.yml']
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install validation dependencies
+        run: python -m pip install -q requests pypdf beautifulsoup4 cryptography
+      - name: Diagnose and retrieve ordinary public sources
+        run: python crc50/diagnostic_repair_v4.py
+      - name: Transfer encrypted result
+        uses: actions/upload-artifact@v4
+        with:
+          name: CRC50-repair-v4-encrypted
+          path: repair_v4_artifact/
+          retention-days: 1
+          if-no-files-found: error
