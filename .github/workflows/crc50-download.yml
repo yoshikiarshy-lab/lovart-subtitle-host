@@ -1,0 +1,25 @@
+name: CRC50 temporary download
+on:
+  push:
+    branches: ['temp/crc50-download-20260918']
+    paths: ['.github/workflows/crc50-download.yml', 'crc50/**']
+permissions:
+  contents: read
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify public-source connectivity
+        run: |
+          python - <<'PY'
+          from urllib.request import urlopen, Request
+          url='https://cdn.techscience.cn/files/or/2025/TSP_OR-33-7/OncolRes-33-07-63951/OncolRes-33-63951.pdf'
+          with urlopen(Request(url,headers={'User-Agent':'CRC50-Public-Research-Download/1.0'}),timeout=30) as r:
+              data=r.read()
+              assert data.startswith(b'%PDF-'), 'Not a PDF'
+              print('PUBLIC_PDF_NETWORK_OK bytes='+str(len(data)))
+          PY
