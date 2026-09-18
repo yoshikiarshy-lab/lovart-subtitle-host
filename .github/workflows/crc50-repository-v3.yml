@@ -8,7 +8,7 @@ permissions:
 jobs:
   retrieve:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,11 +16,11 @@ jobs:
       - name: Install validators
         run: python -m pip install -q requests pypdf beautifulsoup4 cryptography
       - name: Read public repository sources
-        run: python crc50/repository_followup_v3.py
+        run: python crc50/targeted_repository_v3.py
       - name: Store encrypted result
         uses: actions/upload-artifact@v4
         with:
-          name: CRC50-repository-v3-encrypted
+          name: CRC50-targeted-v3-encrypted
           path: repository_v3_artifact/
           retention-days: 1
           if-no-files-found: error
