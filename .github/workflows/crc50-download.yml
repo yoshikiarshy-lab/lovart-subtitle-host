@@ -8,18 +8,20 @@ permissions:
 jobs:
   download:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Verify public-source connectivity
-        run: |
-          python - <<'PY'
-          from urllib.request import urlopen, Request
-          url='https://cdn.techscience.cn/files/or/2025/TSP_OR-33-7/OncolRes-33-07-63951/OncolRes-33-63951.pdf'
-          with urlopen(Request(url,headers={'User-Agent':'CRC50-Public-Research-Download/1.0'}),timeout=30) as r:
-              data=r.read()
-              assert data.startswith(b'%PDF-'), 'Not a PDF'
-              print('PUBLIC_PDF_NETWORK_OK bytes='+str(len(data)))
-          PY
+      - name: Install PDF validation and artifact encryption dependencies
+        run: python -m pip install --disable-pip-version-check requests pypdf cryptography
+      - name: Retrieve public originals and verify identity
+        run: python -u crc50/download.py
+      - name: Upload encrypted temporary bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: CRC50-encrypted-originals
+          path: encrypted_artifact/
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
